@@ -67,6 +67,6 @@ func primesHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/primes", primesHandler)
-	log.Println("🚀 Serviço A REST rodando na porta 8081")
+	log.Println(" Serviço A REST rodando na porta 8081")
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }

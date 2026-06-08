@@ -39,10 +39,10 @@ def discover_grpc_gateway() -> str:
                 print(f"📡 URL gRPC autodetectada via Minikube: {url}")
                 return url
         
-        print(f"⚠️ Não foi possível detectar a URL via Minikube. Usando fallback: {fallback_url}")
+        print(f" Não foi possível detectar a URL via Minikube. Usando fallback: {fallback_url}")
         return fallback_url
     except Exception as e:
-        print(f"⚠️ Erro ao tentar rodar o comando do Minikube ({e}). Usando fallback: {fallback_url}")
+        print(f" Erro ao tentar rodar o comando do Minikube ({e}). Usando fallback: {fallback_url}")
         return fallback_url
 
 # Descoberta da URL em tempo de execução
@@ -94,7 +94,7 @@ async def run_benchmark():
     async with httpx.AsyncClient() as client:
         for min_v, max_v in TEST_INTERVALS:
             label = f"[{min_v:,}, {max_v:,}]"
-            print(f"\n🔄 Testando intervalo {label} …")
+            print(f"\n Testando intervalo {label} …")
 
             for version, url in [("gRPC", GRPC_GATEWAY), ("REST", REST_GATEWAY)]:
                 times = []
@@ -137,7 +137,7 @@ async def run_benchmark():
             writer.writerow([r.interval, r.version, f"{r.mean_ms:.2f}", f"{r.median_ms:.2f}",
                              f"{r.min_ms:.2f}", f"{r.max_ms:.2f}", f"{r.std_ms:.2f}"])
 
-    print("\n📄 Resultados salvos em benchmark_results.csv")
+    print("\n Resultados salvos em benchmark_results.csv")
     return results
 
 

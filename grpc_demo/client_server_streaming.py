@@ -39,7 +39,7 @@ def run():
         for prime in stub.StreamPrimes(request):
             print(f"   Recebido primo #{prime.position}: {prime.value}")
 
-        print("\n✅ Stream encerrado pelo servidor")
+        print("\n Stream encerrado pelo servidor")
 
 
 if __name__ == "__main__":

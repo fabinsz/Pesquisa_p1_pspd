@@ -59,6 +59,6 @@ func statsHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/stats", statsHandler)
-	log.Println("🚀 Serviço B REST rodando na porta 8082")
+	log.Println(" Serviço B REST rodando na porta 8082")
 	log.Fatal(http.ListenAndServe(":8082", nil))
 }

@@ -70,7 +70,7 @@ class DemoServiceServicer(pb_grpc.DemoServiceServicer):
         n = request.number
         prime = is_prime(n)
         factors = prime_factors(n) if not prime else [n]
-        msg = f"{n} É primo! ✅" if prime else f"{n} NÃO é primo. Fatores: {factors}"
+        msg = f"{n} É primo! " if prime else f"{n} NÃO é primo. Fatores: {factors}"
         print(f"[Unary] CheckPrime({n}) → {msg}")
 
         return pb.PrimeCheckResponse(
@@ -136,7 +136,7 @@ class DemoServiceServicer(pb_grpc.DemoServiceServicer):
             n = req.number
             prime = is_prime(n)
             factors = prime_factors(n) if not prime else [n]
-            msg = f"✅ {n} é primo" if prime else f"❌ {n} = {'×'.join(map(str, factors))}"
+            msg = f" {n} é primo" if prime else f" {n} = {'×'.join(map(str, factors))}"
             print(f"[Bidi Stream] {msg}")
             yield pb.PrimeCheckResponse(
                 number=n,
@@ -155,7 +155,7 @@ def serve():
     pb_grpc.add_DemoServiceServicer_to_server(DemoServiceServicer(), server)
     server.add_insecure_port("[::]:50099")
     server.start()
-    print("🚀 Demo Server rodando na porta 50099")
+    print("  Demo Server rodando na porta 50099")
     print("   Use os clientes para testar cada tipo de comunicação:\n")
     print("   python client_unary.py")
     print("   python client_server_streaming.py")

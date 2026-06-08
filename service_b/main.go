@@ -77,7 +77,7 @@ func main() {
 	pb.RegisterStatsServiceServer(grpcServer, &server{})
 	reflection.Register(grpcServer)
 
-	log.Printf("🚀 Serviço B (Estatísticas) rodando em %s", port)
+	log.Printf(" Serviço B (Estatísticas) rodando em %s", port)
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Falha ao iniciar servidor: %v", err)
 	}

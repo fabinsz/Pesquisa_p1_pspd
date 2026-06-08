@@ -78,7 +78,7 @@ func main() {
 	// Habilita reflection para facilitar debug com ferramentas como grpcurl
 	reflection.Register(grpcServer)
 
-	log.Printf("🚀 Serviço A (Primos) rodando em %s", port)
+	log.Printf(" Serviço A (Primos) rodando em %s", port)
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Falha ao iniciar servidor: %v", err)
 	}

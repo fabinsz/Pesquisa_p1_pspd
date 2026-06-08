@@ -49,7 +49,7 @@ def run():
         for resp in responses:
             print(f"  [Servidor → Cliente] {resp.message}")
 
-        print("\n✅ Sessão bidirecional encerrada")
+        print("\n Sessão bidirecional encerrada")
 
 
 if __name__ == "__main__":

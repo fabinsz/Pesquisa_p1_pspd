@@ -45,7 +45,7 @@ def run():
         # Passa o gerador para o stub — ele transmite automaticamente
         response = stub.CountPrimesInBatch(numero_generator(lote))
 
-        print(f"\n✅ Resposta do servidor:")
+        print(f"\n Resposta do servidor:")
         print(f"   Total recebido: {response.total_received}")
         print(f"   Primos no lote: {response.prime_count}")
         print(f"   Primos: {list(response.primes_found)}")
