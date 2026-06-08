@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+
+  service-a:
+    build:
+      context: .
+      dockerfile: service_a/Dockerfile
+    container_name: service-a
+    networks:
+      - pspd-net
+
+  service-b:
+    build:
+      context: .
+      dockerfile: service_b/Dockerfile
+    container_name: service-b
+    networks:
+      - pspd-net
+
+  service-p:
+    build:
+      context: .
+      dockerfile: service_p/Dockerfile
+    container_name: service-p
+    ports:
+      - "8000:8000"
+    environment:
+      - SERVICE_A_ADDR=service-a:50051
+      - SERVICE_B_ADDR=service-b:50052
+    depends_on:
+      - service-a
+      - service-b
+    networks:
+      - pspd-net
+
+networks:
+  pspd-net:
+    driver: bridge

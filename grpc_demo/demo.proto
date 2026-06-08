@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package demo;
+
+// ============================================================
+// Demo proto: demonstra os 4 tipos de comunicação do gRPC
+// ============================================================
+
+service DemoService {
+
+  // 1) UNARY: cliente envia 1 request, servidor responde 1 response
+  // Uso: verificar se um único número é primo
+  rpc CheckPrime(NumberRequest) returns (PrimeCheckResponse);
+
+  // 2) SERVER STREAMING: cliente envia 1 request, servidor responde com stream
+  // Uso: cliente pede um intervalo, servidor envia os primos um por um
+  rpc StreamPrimes(RangeRequest) returns (stream PrimeNumber);
+
+  // 3) CLIENT STREAMING: cliente envia stream de requests, servidor responde 1 vez
+  // Uso: cliente envia vários números, servidor retorna quantos são primos
+  rpc CountPrimesInBatch(stream NumberRequest) returns (BatchPrimeCountResponse);
+
+  // 4) BIDIRECTIONAL STREAMING: ambos trocam streams simultaneamente
+  // Uso: cliente envia números interativamente, servidor responde a cada um
+  rpc InteractivePrimeCheck(stream NumberRequest) returns (stream PrimeCheckResponse);
+}
+
+message NumberRequest {
+  int64 number = 1;
+}
+
+message PrimeCheckResponse {
+  int64 number = 1;
+  bool is_prime = 2;
+  repeated int64 factors = 3;   // fatores primos do número
+  string message = 4;
+}
+
+message RangeRequest {
+  int64 min = 1;
+  int64 max = 2;
+}
+
+message PrimeNumber {
+  int64 value = 1;
+  int64 position = 2;  // qual é o N-ésimo primo encontrado
+}
+
+message BatchPrimeCountResponse {
+  int64 total_received = 1;
+  int64 prime_count = 2;
+  repeated int64 primes_found = 3;
+}

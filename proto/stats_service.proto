@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package statsservice;
+
+option go_package = "./statsservice";
+
+// Serviço B: Calcula estatísticas de um intervalo numérico
+service StatsService {
+  // Unary: Retorna estatísticas completas de um intervalo
+  rpc ComputeStats(RangeRequest) returns (StatsResponse);
+}
+
+message RangeRequest {
+  int64 min = 1;
+  int64 max = 2;
+}
+
+message StatsResponse {
+  double sum = 1;
+  double mean = 2;
+  double variance = 3;
+  double std_dev = 4;
+  int64 count = 5;
+  int64 min_val = 6;
+  int64 max_val = 7;
+  double computation_time_ms = 8;
+}

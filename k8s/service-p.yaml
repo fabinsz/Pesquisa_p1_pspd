@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-p
+  namespace: pspd
+  labels:
+    app: service-p
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-p
+  template:
+    metadata:
+      labels:
+        app: service-p
+    spec:
+      containers:
+      - name: service-p
+        image: pspd/service-p:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        - name: SERVICE_A_ADDR
+          value: "service-a:50051"
+        - name: SERVICE_B_ADDR
+          value: "service-b:50052"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+# NodePort expõe o Serviço P para o HClient via HTTP
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-p
+  namespace: pspd
+spec:
+  selector:
+    app: service-p
+  ports:
+  - port: 8000
+    targetPort: 8000
+    nodePort: 30080
+    protocol: TCP
+    name: http
+  type: NodePort

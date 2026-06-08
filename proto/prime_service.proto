@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package primeservice;
+
+option go_package = "./primeservice";
+
+// Serviço A: Encontra números primos em um intervalo
+service PrimeService {
+  // Unary: Retorna todos os primos de um intervalo
+  rpc GetPrimes(RangeRequest) returns (PrimesResponse);
+}
+
+message RangeRequest {
+  int64 min = 1;
+  int64 max = 2;
+}
+
+message PrimesResponse {
+  repeated int64 primes = 1;
+  int64 count = 2;
+  double computation_time_ms = 3;
+}

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analisador de Intervalos — PSPD/UnB</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    header h1 { font-size: 2rem; color: #60a5fa; }
+    header p  { color: #94a3b8; margin-top: .4rem; font-size: .95rem; }
+
+    .card {
+      background: #1e2130;
+      border: 1px solid #2d3748;
+      border-radius: 12px;
+      padding: 1.8rem;
+      width: 100%;
+      max-width: 700px;
+      margin-bottom: 1.5rem;
+    }
+    .card h2 { font-size: 1.1rem; color: #93c5fd; margin-bottom: 1rem; }
+
+    .form-row { display: flex; gap: 1rem; }
+    .form-group { flex: 1; }
+    label { display: block; font-size: .85rem; color: #94a3b8; margin-bottom: .4rem; }
+    input[type=number] {
+      width: 100%;
+      padding: .6rem .9rem;
+      background: #0f1117;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 1rem;
+    }
+    input[type=number]:focus { outline: none; border-color: #60a5fa; }
+
+    button {
+      margin-top: 1.2rem;
+      width: 100%;
+      padding: .75rem;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    button:hover  { background: #2563eb; }
+    button:active { background: #1d4ed8; }
+    button:disabled { background: #475569; cursor: not-allowed; }
+
+    .results { display: none; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .metric {
+      background: #0f1117;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .metric .label { font-size: .8rem; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
+    .metric .value { font-size: 1.5rem; font-weight: 700; color: #f1f5f9; margin-top: .3rem; }
+    .metric .sub   { font-size: .75rem; color: #475569; margin-top: .2rem; }
+
+    .primes-box {
+      background: #0f1117;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: .9rem;
+      max-height: 160px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: .88rem;
+      color: #86efac;
+      line-height: 1.7;
+      word-break: break-all;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: .75rem;
+      padding: .2rem .6rem;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+    .badge-a { background: #1e3a5f; color: #60a5fa; }
+    .badge-b { background: #1a3a2a; color: #4ade80; }
+    .badge-p { background: #3a1e3a; color: #c084fc; }
+
+    .timing {
+      margin-top: 1rem;
+      display: flex;
+      gap: .8rem;
+      flex-wrap: wrap;
+    }
+    .timing-item {
+      font-size: .82rem;
+      color: #94a3b8;
+    }
+    .timing-item strong { color: #e2e8f0; }
+
+    #error {
+      color: #f87171;
+      background: #2d1515;
+      border: 1px solid #7f1d1d;
+      border-radius: 8px;
+      padding: .8rem 1rem;
+      display: none;
+      margin-top: 1rem;
+      font-size: .9rem;
+    }
+
+    footer {
+      margin-top: 2rem;
+      color: #334155;
+      font-size: .8rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🔢 Analisador de Intervalos Numéricos</h1>
+  <p>PSPD — UnB/FCTE · Projeto de Pesquisa · Microserviços gRPC</p>
+</header>
+
+<!-- Formulário de entrada -->
+<div class="card">
+  <h2>📥 Parâmetros de Análise</h2>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Valor mínimo</label>
+      <input type="number" id="min" value="1" min="1" />
+    </div>
+    <div class="form-group">
+      <label>Valor máximo</label>
+      <input type="number" id="max" value="10000" min="2" />
+    </div>
+  </div>
+  <button id="btn" onclick="analyze()">⚡ Analisar Intervalo</button>
+  <div id="error"></div>
+</div>
+
+<!-- Resultados -->
+<div class="card results" id="results">
+  <h2>📊 Resultados</h2>
+
+  <div class="grid-2" style="margin-bottom:1rem;">
+    <div class="metric">
+      <div class="label">Números Primos <span class="badge badge-a">Serviço A</span></div>
+      <div class="value" id="r-prime-count">—</div>
+      <div class="sub">encontrados no intervalo</div>
+    </div>
+    <div class="metric">
+      <div class="label">Total de Números <span class="badge badge-b">Serviço B</span></div>
+      <div class="value" id="r-count">—</div>
+      <div class="sub">no intervalo analisado</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:1rem;">
+    <div class="metric">
+      <div class="label">Soma <span class="badge badge-b">Serviço B</span></div>
+      <div class="value" id="r-sum">—</div>
+    </div>
+    <div class="metric">
+      <div class="label">Média <span class="badge badge-b">Serviço B</span></div>
+      <div class="value" id="r-mean">—</div>
+    </div>
+    <div class="metric">
+      <div class="label">Variância <span class="badge badge-b">Serviço B</span></div>
+      <div class="value" id="r-var">—</div>
+    </div>
+    <div class="metric">
+      <div class="label">Desvio Padrão <span class="badge badge-b">Serviço B</span></div>
+      <div class="value" id="r-std">—</div>
+    </div>
+  </div>
+
+  <div class="card" style="background:#0f1117; margin-bottom:1rem;">
+    <h2 style="font-size:.9rem; margin-bottom:.6rem;">
+      Primos encontrados <span class="badge badge-a">Serviço A</span>
+    </h2>
+    <div class="primes-box" id="r-primes">—</div>
+  </div>
+
+  <div class="timing" id="timing"></div>
+</div>
+
+<footer>
+  Arquitetura: WEB Client → HTTP → FastAPI (P) → gRPC → Go Services (A, B) → K8s/Minikube
+</footer>
+
+<script>
+  async function analyze() {
+    const btn = document.getElementById('btn');
+    const errDiv = document.getElementById('error');
+    const results = document.getElementById('results');
+    errDiv.style.display = 'none';
+    results.style.display = 'none';
+
+    const min = parseInt(document.getElementById('min').value);
+    const max = parseInt(document.getElementById('max').value);
+
+    if (isNaN(min) || isNaN(max) || min < 1 || max < min) {
+      errDiv.textContent = 'Valores inválidos. Certifique-se que min ≥ 1 e max > min.';
+      errDiv.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Analisando...';
+
+    try {
+      const resp = await fetch('/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ min_val: min, max_val: max }),
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.detail || 'Erro desconhecido');
+      }
+
+      const d = await resp.json();
+
+      // Preenche os resultados
+      document.getElementById('r-prime-count').textContent = d.prime_count.toLocaleString('pt-BR');
+      document.getElementById('r-count').textContent = d.count.toLocaleString('pt-BR');
+      document.getElementById('r-sum').textContent = d.sum.toLocaleString('pt-BR');
+      document.getElementById('r-mean').textContent = d.mean.toFixed(2);
+      document.getElementById('r-var').textContent = d.variance.toFixed(2);
+      document.getElementById('r-std').textContent = d.std_dev.toFixed(2);
+
+      const primesBox = document.getElementById('r-primes');
+      if (d.primes.length === 0) {
+        primesBox.textContent = '(nenhum primo encontrado)';
+      } else {
+        const shown = d.primes.slice(0, 500);
+        primesBox.textContent = shown.join(', ') + (d.primes.length > 500 ? ` … (+${d.primes.length - 500} mais)` : '');
+      }
+
+      document.getElementById('timing').innerHTML = `
+        <div class="timing-item">⏱ <strong>${d.total_time_ms} ms</strong> — tempo total (P)</div>
+        <div class="timing-item">🔵 <strong>${d.prime_computation_ms.toFixed(2)} ms</strong> — Serviço A</div>
+        <div class="timing-item">🟢 <strong>${d.stats_computation_ms.toFixed(2)} ms</strong> — Serviço B</div>
+      `;
+
+      results.style.display = 'block';
+    } catch (e) {
+      errDiv.textContent = '❌ ' + e.message;
+      errDiv.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '⚡ Analisar Intervalo';
+    }
+  }
+</script>
+</body>
+</html>
